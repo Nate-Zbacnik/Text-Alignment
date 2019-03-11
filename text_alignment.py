@@ -19,8 +19,8 @@ import numpy as np
 #import the text file
 #text_loc = r'C:\Users\NATE\Documents\alignment.txt' UNCOMMENT
 
-#text_op = open(text_loc) UNCOMMENT
-#text = text_op.read() UNCOMMENT
+#text_op = open(text_loc)
+#text = text_op.read() 
 text = 'Tennis is a racket sport that can be played individually against a single opponent \
  (singles) or between two teams of two players each (doubles). Each player uses a tennis \
  racket that is strung with cord to strike a hollow rubber ball covered with felt over or \
@@ -43,8 +43,7 @@ text = 'Tennis is a racket sport that can be played individually against a singl
  Majors) are especially popular: the Australian Open played on hard courts, the French \
  Open played on red clay courts, Wimbledon played on grass courts, and the US Open also\
  played on hard courts.'
-
-#text.capitalize() #Optional caps for matching without case(doesnt work??)
+ #text.capitalize() #Optional caps for matching without case(doesnt work??)
 
 
   
@@ -52,7 +51,7 @@ text = 'Tennis is a racket sport that can be played individually against a singl
 def align_text(text,search_str): 
     val_table = fill_table(text,search_str)
     loc = np.argmax(val_table) #best alignment value
-    #val = np.amax(val_table)
+    val = np.amax(val_table)
     y_loc = loc % np.shape(val_table)[1]
     x_loc = int((loc -y_loc)/np.shape(val_table)[1])
     
@@ -62,9 +61,9 @@ def align_text(text,search_str):
     l=0
     i = 0
     while i <len(search_str):
-        if x_loc < len(search_str) - i-1:
+        if x_loc < len(search_str) - i:
             match_str = match_str + search_str[len(search_str)-i - 1]
-            match_txt = match_txt + text[y_loc+len(search_str)-1-i-x_loc]
+            match_txt = match_txt + ' ' #text[y_loc+len(search_str)-1-i-x_loc]
         else:
             txt_gap_val = val_table[len(search_str)-i ,y_loc+len(search_str)-1-i-x_loc-l+k]
             str_gap_val = val_table[len(search_str)-i - 1,y_loc+len(search_str)-i-x_loc-l+k]
@@ -89,11 +88,11 @@ def align_text(text,search_str):
             
     #print(loc)
     #print(np.shape(val_table))
-    #print(x_loc, y_loc)
-    #print(val)
-    #print(val_table[:,0:10])
-    print(''.join(reversed(match_str)))
-    print(''.join(reversed(match_txt)))
+    print(x_loc, y_loc)
+    print(val)
+    print(val_table[:,0:10])
+    print('Search String: ' + ''.join(reversed(match_str)))
+    print('Best Match:    ' + ''.join(reversed(match_txt)))
     
 #This function dynamically creates the table of matching scores from the string and text   
 def fill_table(text,search_str):
