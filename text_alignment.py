@@ -17,7 +17,7 @@ import numpy as np
 
 
 #import the text file
-#text_loc = r'C:\Users\NATE\Documents\alignment.txt' UNCOMMENT
+#text_loc = r'C:\Users\NATE\Documents\alignment.txt' 
 
 #text_op = open(text_loc)
 #text = text_op.read() 
@@ -43,56 +43,61 @@ text = 'Tennis is a racket sport that can be played individually against a singl
  Majors) are especially popular: the Australian Open played on hard courts, the French \
  Open played on red clay courts, Wimbledon played on grass courts, and the US Open also\
  played on hard courts.'
- #text.capitalize() #Optional caps for matching without case(doesnt work??)
 
 
   
 #This function calls text_table and then (not yet) reconstructs the best alignments from the table
 def align_text(text,search_str): 
     val_table = fill_table(text,search_str)
-    loc = np.argmax(val_table) #best alignment value
-    val = np.amax(val_table)
-    y_loc = loc % np.shape(val_table)[1]
-    x_loc = int((loc -y_loc)/np.shape(val_table)[1])
-    
-    match_str = ''
-    match_txt = ''
-    k = 0
-    l=0
-    i = 0
-    while i <len(search_str):
-        if x_loc < len(search_str) - i:
-            match_str = match_str + search_str[len(search_str)-i - 1]
-            match_txt = match_txt + ' ' #text[y_loc+len(search_str)-1-i-x_loc]
-        else:
-            txt_gap_val = val_table[len(search_str)-i ,y_loc+len(search_str)-1-i-x_loc-l+k]
-            str_gap_val = val_table[len(search_str)-i - 1,y_loc+len(search_str)-i-x_loc-l+k]
-            match_val = val_table[len(search_str)-i - 1,y_loc+len(search_str)-1-i-x_loc-l+k]
-            #print(txt_gap_val, str_gap_val, match_val)
-            if match_val >= str_gap_val and match_val >= txt_gap_val:
+    for j in range(5):
+        loc = np.argmax(val_table) #best alignment value
+        val = np.amax(val_table)
+        y_loc = loc % np.shape(val_table)[1]
+        x_loc = int((loc -y_loc)/np.shape(val_table)[1])
+        val_table[x_loc,y_loc] = 0
+        match_str = ''
+        match_txt = ''
+        k = 0
+        l=0
+        i = 0
+        q=0 #keep track of how far to subtract to get starting match position
+        while i <len(search_str):
+            if x_loc < len(search_str) - i:
                 match_str = match_str + search_str[len(search_str)-i - 1]
-                match_txt = match_txt + text[y_loc+len(search_str)-i-1-x_loc-l+k]
-            elif str_gap_val > txt_gap_val:
-                
-                match_str = match_str + search_str[len(search_str)-i -1] 
-                match_txt = match_txt + '_'
-                k+=1 #need to just move up, not up n left
-                
+                match_txt = match_txt + ' ' #text[y_loc+len(search_str)-1-i-x_loc]
+                q-=1
             else:
-                match_str = match_str + '_'
-                match_txt = match_txt + text[y_loc+len(search_str)-i-1-x_loc-l+k]
-                l+=1 #move left
-                i-=1 #but not up
-        i+=1
-            
-            
-    #print(loc)
-    #print(np.shape(val_table))
-    print(x_loc, y_loc)
-    print(val)
-    print(val_table[:,0:10])
-    print('Search String: ' + ''.join(reversed(match_str)))
-    print('Best Match:    ' + ''.join(reversed(match_txt)))
+                txt_gap_val = val_table[len(search_str)-i ,y_loc+len(search_str)-1-i-x_loc-l+k]
+                str_gap_val = val_table[len(search_str)-i - 1,y_loc+len(search_str)-i-x_loc-l+k]
+                match_val = val_table[len(search_str)-i - 1,y_loc+len(search_str)-1-i-x_loc-l+k]
+                #print(txt_gap_val, str_gap_val, match_val)
+                if match_val >= str_gap_val and match_val >= txt_gap_val:
+                    match_str = match_str + search_str[len(search_str)-i - 1]
+                    match_txt = match_txt + text[y_loc+len(search_str)-i-1-x_loc-l+k]
+                    
+                elif str_gap_val > txt_gap_val:
+                    
+                    match_str = match_str + search_str[len(search_str)-i -1] 
+                    match_txt = match_txt + '_'
+                    k+=1 #need to just move up, not up n left
+                    q-=1
+                else:
+                    match_str = match_str + '_'
+                    match_txt = match_txt + text[y_loc+len(search_str)-i-1-x_loc-l+k]
+                    l+=1 #move left
+                    i-=1 #but not up
+            i+=1
+            q+=1
+                
+                
+        #print(q)
+        #print(x_loc, y_loc)
+        hit_num = j+1
+        a = y_loc-q
+        print('hit' , hit_num, ', score =', val)
+        print('Search String:   ' + ''.ljust(len(str(a))-1) + ''.join(reversed(match_str)))
+        print('Best Match:   '+ '[' + str(a)+']' +  ''.join(reversed(match_txt)))
+        print('\n')
     
 #This function dynamically creates the table of matching scores from the string and text   
 def fill_table(text,search_str):
